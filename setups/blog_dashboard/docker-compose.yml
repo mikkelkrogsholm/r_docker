@@ -86,10 +86,10 @@ services:
       - USER=${USER} # change line
       - PASSWORD=${PASSWORD} # change line
     volumes:
-      - shiny-apps:/home/${USERNAME}/shiny_apps/
+      - shiny-apps:/home/${USER}/shiny_apps/
       - r-packages:/usr/local/lib/R/site-library
       - backup:/home/
-      - ./blog/:/home/${USERNAME}/blog/
+      - ./blog/:/home/${USER}/blog/
 
 # Blogdown blog
   blog:
