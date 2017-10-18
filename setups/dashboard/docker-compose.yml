@@ -53,7 +53,7 @@ services:
 # Spin up a Shiny docker
   shiny:
       restart: always
-      image: mikkelkrogsholm/shiny:${VERSION}
+      image: mikkelkrogsholm/shiny
       container_name: shiny
       expose:
         - "3838"
@@ -91,7 +91,7 @@ services:
 
   rstudio:
     restart: always
-    image: mikkelkrogsholm/rstudio:${VERSION}
+    image: mikkelkrogsholm/rstudio
     container_name: rstudio
     depends_on:
       - shiny

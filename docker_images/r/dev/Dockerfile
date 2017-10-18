@@ -1,6 +1,6 @@
 ## Emacs, make this -*- mode: sh; -*-
 
-FROM mikkelkrogsholm/debian
+FROM mikkelkrogsholm/debian:dev
 
 ## This handle reaches Mikkel
 MAINTAINER "Mikkel Freltoft Krogsholm" mikkel@56n.dk
@@ -64,6 +64,6 @@ RUN apt-get update \
 	RUN Rscript -e 'install.packages(c("tidyverse", "devtools"), dependencies = TRUE, repos = "https://cran.rstudio.com")'
 
 	## Add other usefull packages
-	RUN Rscript -e 'install.packages(c("rgdal", "rJava", "bcrypt", "shiny", "rmarkdown", "knitr", "shinydashboard", "data.table", "mailR", "shinyjs", "DT", "leaflet", "rio", "RPostgreSQL", "pacman", "xts", "dygraphs", "plotly", "highcharter", "listviewer", "testthat", "ReporteRs", "selectr", "pbapply", "googlesheets", "timevis", "owmr"), dependencies = TRUE, repos = "https://cran.rstudio.com")'
+	RUN Rscript -e 'install.packages(c("rgdal", "rJava", "bcrypt", "shiny", "rmarkdown", "knitr", "shinydashboard", "data.table", "mailR", "shinyjs", "DT", "leaflet", "rio", "RPostgreSQL", "pacman", "xts", "dygraphs", "plotly", "highcharter", "listviewer", "testthat", "ReporteRs", "selectr", "pbapply", "googlesheets", "timevis", "owmr", "magick"), dependencies = TRUE, repos = "https://cran.rstudio.com")'
 
 CMD ["R"]

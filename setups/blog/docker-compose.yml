@@ -63,11 +63,11 @@ services:
       - VIRTUAL_PORT=80
       - LETSENCRYPT_HOST=${RSTUDIO_DOMAIN} # change line
       - LETSENCRYPT_EMAIL=${EMAIL} # change line
-      - USER=${USERNAME}
+      - USER=${USER}
       - PASSWORD=${PASSWORD}
     volumes:
       - backup:/home/
-      - ./blog/:/home/${USERNAME}/blog/
+      - ./blog/:/home/${USER}/blog/
 
 # Blogdown blog
   blog:

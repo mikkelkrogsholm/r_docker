@@ -74,7 +74,7 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
 RUN apt-get update -qq && apt-get -y --no-install-recommends install \
   libssl-dev \
   libgdal1-dev \
-  libproj-dev 
+  libproj-dev
 
 ## Rstudio libs
 RUN apt-get update \
@@ -99,4 +99,4 @@ RUN apt-get update \
     pandoc-citeproc \
     libcurl4-gnutls-dev \
     libcairo2-dev \
-    libxt-dev 
+    libxt-dev
