@@ -1,4 +1,4 @@
-FROM mikkelkrogsholm/debian
+FROM mikkelkrogsholm/debian:stable
 
 ARG R_VERSION
 ARG BUILD_DATE

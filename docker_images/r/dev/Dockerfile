@@ -1,5 +1,3 @@
-## Emacs, make this -*- mode: sh; -*-
-
 FROM mikkelkrogsholm/debian:dev
 
 ## This handle reaches Mikkel

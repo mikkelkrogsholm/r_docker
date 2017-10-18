@@ -1,4 +1,4 @@
-FROM mikkelkrogsholm/r-base
+FROM mikkelkrogsholm/r-base:stable
 
 ARG RSTUDIO_VERSION
 ARG PANDOC_TEMPLATES_VERSION 
