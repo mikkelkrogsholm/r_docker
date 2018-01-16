@@ -1,4 +1,4 @@
-FROM mikkelkrogsholm/r-base
+FROM mikkelkrogsholm/r-base:stable
 
 ARG RSTUDIO_VERSION
 ARG PANDOC_TEMPLATES_VERSION
@@ -10,8 +10,8 @@ ENV PATH /usr/lib/rstudio-server/bin:$PATH
 ## Download and install RStudio server & dependencies
 ## Attempts to get detect latest version, otherwise falls back to version given in $VER
 ## Symlink pandoc, pandoc-citeproc so they are available system-wide
-RUN wget -q https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-1.1.379-amd64.deb \
-  && dpkg -i rstudio-server-1.1.379-amd64.deb \
+RUN wget -q https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-1.1.414-amd64.deb \
+  && dpkg -i rstudio-server-1.1.414-amd64.deb \
   && rm rstudio-server-*-amd64.deb \
   ## Symlink pandoc & standard pandoc templates for use system-wide
   && ln -s /usr/lib/rstudio-server/bin/pandoc/pandoc /usr/local/bin \

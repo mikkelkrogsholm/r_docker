@@ -1,0 +1,148 @@
+version: "2"
+
+services:
+
+######################### SETUP OF PROXY AND SSL ###############################
+
+# Don't edit this service
+  nginx:
+    restart: always
+    image: nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/etc/nginx/conf.d"
+      - "/etc/nginx/vhost.d"
+      - "/usr/share/nginx/html"
+      - "./volumes/proxy/certs:/etc/nginx/certs:ro"
+
+# Don't edit this service
+  nginx-gen:
+    restart: always
+    image: jwilder/docker-gen
+    container_name: nginx-gen
+    depends_on:
+      - nginx
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "./volumes/proxy/templates/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+    volumes_from:
+      - nginx
+    entrypoint: /usr/local/bin/docker-gen -notify-sighup nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+
+# Don't edit this service
+  letsencrypt-nginx-proxy-companion:
+    restart: always
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt-nginx-proxy-companion
+    depends_on:
+      - nginx
+      - nginx-gen
+    volumes_from:
+      - nginx
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./volumes/proxy/certs:/etc/nginx/certs:rw"
+    environment:
+      - NGINX_DOCKER_GEN_CONTAINER=nginx-gen
+
+####################### SETUP OF DOCKER CONTAINERS #############################
+
+# Spin up a Shiny docker
+  shiny:
+      restart: always
+      image: mikkelkrogsholm/shiny:stable
+      container_name: shiny
+      expose:
+        - "3838"
+      environment:
+        - VIRTUAL_HOST=${SHINY_DOMAIN}
+        - VIRTUAL_NETWORK=nginx-proxy
+        - VIRTUAL_PORT=80
+        - LETSENCRYPT_HOST=${SHINY_DOMAIN}
+        - LETSENCRYPT_EMAIL=${EMAIL}
+      volumes:
+        - shiny-apps:/srv/shiny-server/
+        - ./volumes/shiny/logs:/var/log/
+        - r-packages:/usr/local/lib/R/site-library
+
+# Spin up Rstudio docker
+
+## Use this version to add several users
+  # rstudio:
+  #   restart: always
+  #   build: ./addusers
+  #   container_name: rstudio
+  #   depends_on:
+  #     - shiny
+  #   expose:
+  #     - "8787"
+  #   environment:
+  #     - VIRTUAL_HOST=${RSTUDIO_DOMAIN} # change line
+  #     - VIRTUAL_NETWORK=nginx-proxy
+  #     - VIRTUAL_PORT=80
+  #     - LETSENCRYPT_HOST=${RSTUDIO_DOMAIN} # change line
+  #     - LETSENCRYPT_EMAIL=${EMAIL} # change line
+  #   volumes:
+  #     - shiny-apps:/home/apps
+  #     - r-packages:/usr/local/lib/R/site-library
+
+  rstudio:
+    restart: always
+    image: mikkelkrogsholm/rstudio:stable
+    container_name: rstudio
+    depends_on:
+      - shiny
+    expose:
+      - "8787"
+    environment:
+      - VIRTUAL_HOST=${RSTUDIO_DOMAIN}
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=${RSTUDIO_DOMAIN}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+      - USER=${USER}
+      - PASSWORD=${PASSWORD}
+    volumes:
+      - shiny-apps:/home/apps
+      - r-packages:/usr/local/lib/R/site-library
+      - backup:/home/
+
+  db:
+    image: mysql
+    volumes:
+      - mysql-backup:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+
+  piwik:
+    image: piwik
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=${PIWIK_DOMAIN}
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=${PIWIK_DOMAIN}
+      - LETSENCRYPT_EMAIL=${EMAIL}
+
+
+# Watchtower is a process for watching your Docker containers and automatically
+# updating and restarting them whenever their base image is refreshed.
+  # watchtower:
+  #   restart: always
+  #   image: v2tec/watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - /root/.docker/config.json:/config.json
+  #   # Look for new images every midnight and Removes old images
+  #   command: --schedule "0 0 0 *" --cleanup
+
+# Create data docker volumes
+volumes:
+  shiny-apps: # holds the shiny apps
+  r-packages: # holds new common libraries
+  backup: # makes backup of the /home folder in Rstudio docker.
+  mysql-backup: # backs up piwik mysql data base
